@@ -54,10 +54,6 @@ const trustInfo = await resolver.query({
 });
 ```
 
-## Project Status
-
-This project is currently in the **Labs** maturity level under the OpenWallet Foundation.
-
 ## Contributing
 
 We welcome contributions from the community! Please feel free to:

@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpCode,
+  Get,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import {
   RecognitionRequestDto,
@@ -77,7 +84,7 @@ export class ResolverController {
     return response;
   }
 
-  @Post('health')
+  @Get('health')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Health check',

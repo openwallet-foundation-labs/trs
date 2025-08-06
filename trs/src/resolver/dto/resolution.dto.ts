@@ -1,6 +1,27 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsIn, IsObject } from 'class-validator';
-import { TrustRegistryResponse } from '../../common/types/trqp.types';
+
+export interface AuthorityStatement {
+  authority_id: string;
+  entity_id: string;
+  assertion_id: string;
+  context: {
+    time: string;
+    [key: string]: string;
+  };
+}
+
+export interface TrustRegistryResponse {
+  recognized: boolean;
+  authorized?: boolean;
+  authority_statements?: AuthorityStatement[];
+  delegation_chain?: string[];
+  metadata?: {
+    timestamp: string;
+    trs_endpoint: string;
+    [key: string]: string;
+  };
+}
 
 export class ResolutionRequestDto {
   @ApiProperty({

@@ -15,11 +15,12 @@ import {
   AuthorizationRequestDto,
   AuthorizationResponseDto,
 } from './dto/authorization.dto';
+import { TrsService } from './services/trs.service';
 
 @ApiTags('TRQP Resolver')
 @Controller('resolver')
 export class ResolverController {
-  constructor() {}
+  constructor(private readonly trsService: TrsService) {}
 
   @Post('recognition')
   @HttpCode(HttpStatus.OK)
@@ -41,11 +42,19 @@ export class ResolverController {
   async recognition(
     @Body() requestDto: RecognitionRequestDto,
   ): Promise<RecognitionResponseDto> {
+    const trsResult = await this.trsService.resolveEntity({
+      entityId: requestDto.entity_id,
+      authorityId: requestDto.authority_id,
+      context: {
+        scope: requestDto.scope,
+        time: requestDto.time,
+      },
+    });
+
     const response: RecognitionResponseDto = {
-      recognized: false,
+      recognized: trsResult.recognized,
       metadata: {
-        timestamp: new Date().toISOString(),
-        authority: requestDto.authority_id,
+        timestamp: trsResult.metadata.timestamp,
       },
     };
 
@@ -72,12 +81,20 @@ export class ResolverController {
   async authorization(
     @Body() requestDto: AuthorizationRequestDto,
   ): Promise<AuthorizationResponseDto> {
+    const trsResult = await this.trsService.resolveEntity({
+      entityId: requestDto.entity_id,
+      assertionId: requestDto.assertion_id,
+      authorityId: requestDto.authority_id,
+      context: {
+        scope: requestDto.scope,
+        time: requestDto.time,
+      },
+    });
+
     const response: AuthorizationResponseDto = {
-      authorized: false,
+      authorized: trsResult.authorized || false,
       metadata: {
-        timestamp: new Date().toISOString(),
-        authority: requestDto.authority_id,
-        assertion: requestDto.assertion_id,
+        timestamp: trsResult.metadata.timestamp,
       },
     };
 

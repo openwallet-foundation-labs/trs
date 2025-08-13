@@ -90,7 +90,6 @@ Returns Entity Configuration in JWT format
 ### How to Run
 
 ```bash
-cd /Users/seorimyun/Documents/back/hTrust
 npm install
 npm run start:dev  # Runs on port 3000
 ```

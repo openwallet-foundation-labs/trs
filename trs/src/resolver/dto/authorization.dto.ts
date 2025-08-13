@@ -1,43 +1,43 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsObject } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class AuthorizationRequestDto {
   @ApiProperty({
+    description: 'Authority identifier for the Trust Registry',
+    example: 'https://trust-registry.example.com',
+  })
+  @IsString()
+  authority_id: string;
+
+  @ApiProperty({
     description: 'Entity identifier to check authorization for',
-    example: 'did:example:123456789abcdefghi',
+    example: 'https://entity.example.com',
   })
   @IsString()
   entity_id: string;
 
   @ApiProperty({
     description: 'Assertion identifier to check authorization for',
-    example: 'assertion:example:abc123',
+    example: 'credential_issuer',
   })
   @IsString()
   assertion_id: string;
 
   @ApiPropertyOptional({
-    description: 'Specific authority identifier (optional)',
-    example: 'did:example:authority123',
+    description: 'Scope for the authorization request',
+    example: 'financial-services',
   })
   @IsOptional()
   @IsString()
-  authority_id?: string;
+  scope?: string;
 
   @ApiPropertyOptional({
-    description: 'Additional context for authorization request',
-    example: {
-      time: '2024-01-01T00:00:00Z',
-      ecosystem: 'example-ecosystem',
-    },
+    description: 'Time for the authorization request in ISO 8601 format',
+    example: '2025-01-01T00:00:00Z',
   })
   @IsOptional()
-  @IsObject()
-  context?: {
-    time?: string;
-    ecosystem?: string;
-    [key: string]: string;
-  };
+  @IsString()
+  time?: string;
 }
 
 export class AuthorizationResponseDto {
@@ -47,20 +47,14 @@ export class AuthorizationResponseDto {
   })
   authorized: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Authorization result metadata',
     example: {
-      timestamp: '2024-01-01T00:00:00Z',
-      authority: 'did:example:authority123',
-      assertion: 'assertion:example:abc123',
-      expires_at: '2024-12-31T23:59:59Z',
+      timestamp: '2025-01-01T00:00:00Z',
     },
   })
-  metadata: {
+  metadata?: {
     timestamp: string;
-    authority?: string;
-    assertion?: string;
-    expires_at?: string;
-    [key: string]: string;
+    [key: string]: any;
   };
 }

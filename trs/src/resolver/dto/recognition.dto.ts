@@ -1,36 +1,36 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsObject } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class RecognitionRequestDto {
   @ApiProperty({
+    description: 'Authority identifier for the Trust Registry',
+    example: 'https://trust-registry.example.com',
+  })
+  @IsString()
+  authority_id: string;
+
+  @ApiProperty({
     description: 'Entity identifier to be recognized',
-    example: 'did:example:123456789abcdefghi',
+    example: 'https://entity.example.com',
   })
   @IsString()
   entity_id: string;
 
   @ApiPropertyOptional({
-    description: 'Specific authority identifier (optional)',
-    example: 'did:example:authority123',
+    description: 'Scope for the recognition request',
+    example: 'financial-services',
   })
   @IsOptional()
   @IsString()
-  authority_id?: string;
+  scope?: string;
 
   @ApiPropertyOptional({
-    description: 'Additional context for recognition request',
-    example: {
-      time: '2024-01-01T00:00:00Z',
-      ecosystem: 'example-ecosystem',
-    },
+    description: 'Time for the recognition request in ISO 8601 format',
+    example: '2025-01-01T00:00:00Z',
   })
   @IsOptional()
-  @IsObject()
-  context?: {
-    time?: string;
-    ecosystem?: string;
-    [key: string]: string;
-  };
+  @IsString()
+  time?: string;
 }
 
 export class RecognitionResponseDto {
@@ -40,18 +40,14 @@ export class RecognitionResponseDto {
   })
   recognized: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Recognition result metadata',
     example: {
-      timestamp: '2024-01-01T00:00:00Z',
-      authority: 'did:example:authority123',
-      confidence: 0.95,
+      timestamp: '2025-01-01T00:00:00Z',
     },
   })
-  metadata: {
+  metadata?: {
     timestamp: string;
-    authority?: string;
-    confidence?: string;
-    [key: string]: string;
+    [key: string]: any;
   };
 }

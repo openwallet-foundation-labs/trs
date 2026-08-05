@@ -1,0 +1,9 @@
+{
+  "name": "trs-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build:core": "pnpm --filter @trs/trqp-core build",
+    "test:server": "pnpm --filter trs test"
+  }
+}

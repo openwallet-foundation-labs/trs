@@ -1,8 +1,42 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/resolver/src",
+  "monorepo": true,
+  "root": "apps/resolver",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/resolver/tsconfig.app.json"
+  },
+  "projects": {
+    "resolver": {
+      "type": "application",
+      "root": "apps/resolver",
+      "entryFile": "main",
+      "sourceRoot": "apps/resolver/src",
+      "compilerOptions": { "tsConfigPath": "apps/resolver/tsconfig.app.json" }
+    },
+    "adapter-kit": {
+      "type": "library",
+      "root": "libs/adapter-kit",
+      "entryFile": "index",
+      "sourceRoot": "libs/adapter-kit/src",
+      "compilerOptions": { "tsConfigPath": "libs/adapter-kit/tsconfig.lib.json" }
+    },
+    "adapter-did-web": {
+      "type": "library",
+      "root": "libs/adapter-did-web",
+      "entryFile": "index",
+      "sourceRoot": "libs/adapter-did-web/src",
+      "compilerOptions": { "tsConfigPath": "libs/adapter-did-web/tsconfig.lib.json" }
+    },
+    "cache": {
+      "type": "library",
+      "root": "libs/cache",
+      "entryFile": "index",
+      "sourceRoot": "libs/cache/src",
+      "compilerOptions": { "tsConfigPath": "libs/cache/tsconfig.lib.json" }
+    }
   }
 }

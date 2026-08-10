@@ -1,0 +1,21 @@
+{
+  "name": "@trs/trqp-core",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared TRQP v2.0 types & zod schemas (single source of truth)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

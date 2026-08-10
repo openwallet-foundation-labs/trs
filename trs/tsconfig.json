@@ -10,15 +10,22 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]
-    },
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@app/adapter-kit": ["libs/adapter-kit/src"],
+      "@app/adapter-kit/*": ["libs/adapter-kit/src/*"],
+      "@app/adapter-did-web": ["libs/adapter-did-web/src"],
+      "@app/adapter-did-web/*": ["libs/adapter-did-web/src/*"],
+      "@app/cache": ["libs/cache/src"],
+      "@app/cache/*": ["libs/cache/src/*"]
+    }
   }
 }

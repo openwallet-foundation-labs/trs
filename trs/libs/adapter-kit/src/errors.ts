@@ -23,6 +23,13 @@ export class RoutingUnavailableError extends AdapterError {
   }
 }
 
+/** The adapter's upstream trust source is unreachable, unparseable, or fails verification → 503. */
+export class TrustSourceUnavailableError extends AdapterError {
+  constructor(message: string) {
+    super(message, 503);
+  }
+}
+
 /** Adapter matched but does not implement the requested operation → 501. */
 export class UnsupportedOperationError extends AdapterError {
   constructor(operation: string, adapterId: string) {

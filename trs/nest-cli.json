@@ -15,28 +15,63 @@
       "root": "apps/resolver",
       "entryFile": "main",
       "sourceRoot": "apps/resolver/src",
-      "compilerOptions": { "tsConfigPath": "apps/resolver/tsconfig.app.json" }
+      "compilerOptions": {
+        "tsConfigPath": "apps/resolver/tsconfig.app.json"
+      }
     },
     "adapter-kit": {
       "type": "library",
       "root": "libs/adapter-kit",
       "entryFile": "index",
       "sourceRoot": "libs/adapter-kit/src",
-      "compilerOptions": { "tsConfigPath": "libs/adapter-kit/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/adapter-kit/tsconfig.lib.json"
+      }
     },
     "adapter-did-web": {
       "type": "library",
       "root": "libs/adapter-did-web",
       "entryFile": "index",
       "sourceRoot": "libs/adapter-did-web/src",
-      "compilerOptions": { "tsConfigPath": "libs/adapter-did-web/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/adapter-did-web/tsconfig.lib.json"
+      }
+    },
+    "adapter-trusted-list": {
+      "type": "library",
+      "root": "libs/adapter-trusted-list",
+      "entryFile": "index",
+      "sourceRoot": "libs/adapter-trusted-list/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/adapter-trusted-list/tsconfig.lib.json"
+      }
+    },
+    "adapter-registrar": {
+      "type": "library",
+      "root": "libs/adapter-registrar",
+      "entryFile": "index",
+      "sourceRoot": "libs/adapter-registrar/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/adapter-registrar/tsconfig.lib.json"
+      }
+    },
+    "jws": {
+      "type": "library",
+      "root": "libs/jws",
+      "entryFile": "index",
+      "sourceRoot": "libs/jws/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/jws/tsconfig.lib.json"
+      }
     },
     "cache": {
       "type": "library",
       "root": "libs/cache",
       "entryFile": "index",
       "sourceRoot": "libs/cache/src",
-      "compilerOptions": { "tsConfigPath": "libs/cache/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/cache/tsconfig.lib.json"
+      }
     }
   }
 }

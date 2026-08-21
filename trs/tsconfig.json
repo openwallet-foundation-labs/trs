@@ -24,6 +24,12 @@
       "@app/adapter-kit/*": ["libs/adapter-kit/src/*"],
       "@app/adapter-did-web": ["libs/adapter-did-web/src"],
       "@app/adapter-did-web/*": ["libs/adapter-did-web/src/*"],
+      "@app/jws": ["libs/jws/src"],
+      "@app/jws/*": ["libs/jws/src/*"],
+      "@app/adapter-trusted-list": ["libs/adapter-trusted-list/src"],
+      "@app/adapter-trusted-list/*": ["libs/adapter-trusted-list/src/*"],
+      "@app/adapter-registrar": ["libs/adapter-registrar/src"],
+      "@app/adapter-registrar/*": ["libs/adapter-registrar/src/*"],
       "@app/cache": ["libs/cache/src"],
       "@app/cache/*": ["libs/cache/src/*"]
     }

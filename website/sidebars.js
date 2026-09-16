@@ -12,6 +12,12 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Adapters',
+      collapsed: false,
+      items: ['adapters/eu-trusted-list'],
+    },
+    {
+      type: 'category',
       label: 'Contributing',
       collapsed: false,
       items: [

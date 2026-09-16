@@ -31,6 +31,13 @@
       "sourceRoot": "libs/adapter-did-web/src",
       "compilerOptions": { "tsConfigPath": "libs/adapter-did-web/tsconfig.lib.json" }
     },
+    "adapter-eu-trusted-list": {
+      "type": "library",
+      "root": "libs/adapter-eu-trusted-list",
+      "entryFile": "index",
+      "sourceRoot": "libs/adapter-eu-trusted-list/src",
+      "compilerOptions": { "tsConfigPath": "libs/adapter-eu-trusted-list/tsconfig.lib.json" }
+    },
     "cache": {
       "type": "library",
       "root": "libs/cache",

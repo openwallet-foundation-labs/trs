@@ -94,7 +94,7 @@ differently:
 |----------|-------------------------|
 | did:web / did:webvh / did:webs | method prefix, no I/O |
 | OpenID Federation | `GET /.well-known/openid-federation` succeeds? (a **probe**) |
-| EUDI Trusted List | is the authority a member of the loaded trusted list? |
+| EU Trusted List ([ETSI TS 119 612](../adapters/eu-trusted-list.md)) | is the authority a configured trusted list, or one the loaded LoTL points to? |
 | PKI (X.509) | does it chain to a configured trust anchor? |
 
 Probing a well-known endpoint is legitimate — those endpoints exist precisely so

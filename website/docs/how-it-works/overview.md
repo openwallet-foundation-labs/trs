@@ -20,6 +20,7 @@ organized as a monorepo inside a pnpm workspace.
     libs/
       adapter-kit/               # adapter interface, @TrustAdapter, AdapterRegistry, errors, StaticAdapter
       adapter-did-web/           # the did:web adapter
+      adapter-eu-trusted-list/   # EU LoTL / national trusted lists (ETSI TS 119 612)
       cache/                     # in-memory cache
   client/                        # trust-resolver client SDK
   website/                       # this documentation site

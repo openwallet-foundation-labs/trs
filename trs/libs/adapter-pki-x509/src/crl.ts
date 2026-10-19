@@ -11,37 +11,26 @@ import {
   TAG,
 } from './der';
 
-/** CRL extensions that do not change how the list is read. */
-const PROCESSED_CRL_EXTENSIONS = new Set([
-  '2.5.29.20', // cRLNumber
-  '2.5.29.35', // authorityKeyIdentifier
-]);
+const PROCESSED_CRL_EXTENSIONS = new Set(['2.5.29.20', '2.5.29.35']);
 
-/** Entry extensions that do not change which certificate is revoked. */
-const PROCESSED_ENTRY_EXTENSIONS = new Set([
-  '2.5.29.21', // reasonCode
-  '2.5.29.24', // invalidityDate
-]);
+const PROCESSED_ENTRY_EXTENSIONS = new Set(['2.5.29.21', '2.5.29.24']);
 
-/** Signature algorithm OID → digest for `crypto.verify` (null = built into the key type). */
 const SIGNATURE_DIGESTS: Record<string, string | null> = {
-  '1.2.840.113549.1.1.11': 'sha256', // sha256WithRSAEncryption
+  '1.2.840.113549.1.1.11': 'sha256',
   '1.2.840.113549.1.1.12': 'sha384',
   '1.2.840.113549.1.1.13': 'sha512',
-  '1.2.840.10045.4.3.2': 'sha256', // ecdsa-with-SHA256
+  '1.2.840.10045.4.3.2': 'sha256',
   '1.2.840.10045.4.3.3': 'sha384',
   '1.2.840.10045.4.3.4': 'sha512',
-  '1.3.101.112': null, // Ed25519
-  '1.3.101.113': null, // Ed448
+  '1.3.101.112': null,
+  '1.3.101.113': null,
 };
 
-/** A parsed, complete (non-delta, direct) certificate revocation list. */
 export interface Crl {
   der: Buffer;
   issuerName: Buffer;
   thisUpdate: Date;
   nextUpdate?: Date;
-  /** Revoked serial (lowercase hex) → revocation date. */
   revoked: Map<string, Date>;
   tbs: Buffer;
   signatureAlgorithm: string;
@@ -62,11 +51,6 @@ export function pemOrBase64CrlToDer(input: string): Buffer {
   );
 }
 
-/**
- * Parses an RFC 5280 CRL. Delta CRLs, CRLs scoped by an issuing distribution
- * point and indirect CRLs are refused (their critical extensions are not
- * processed), so a parsed CRL always covers every certificate of its issuer.
- */
 export function parseCrl(der: Buffer): Crl {
   try {
     const list = readTlv(der, 0);
@@ -75,8 +59,8 @@ export function parseCrl(der: Buffer): Crl {
       throw new CrlParseError('not a CertificateList');
     }
     const fields = children(der, tbs);
-    let i = fields[0]?.tag === TAG.INTEGER ? 1 : 0; // optional version
-    i++; // signature algorithm (repeated in the outer structure)
+    let i = fields[0]?.tag === TAG.INTEGER ? 1 : 0;
+    i++;
     const issuer = fields[i++];
     const thisUpdate = decodeTime(der, fields[i++]);
     let nextUpdate: Date | undefined;
@@ -114,7 +98,7 @@ export function parseCrl(der: Buffer): Crl {
       revoked,
       tbs: Buffer.from(raw(der, tbs)),
       signatureAlgorithm: decodeOid(content(der, children(der, algorithm)[0])),
-      signature: Buffer.from(sigBits.subarray(1)), // skip unused-bits byte
+      signature: Buffer.from(sigBits.subarray(1)),
     };
   } catch (e) {
     if (e instanceof CrlParseError) throw e;
@@ -141,7 +125,6 @@ function assertProcessed(
   }
 }
 
-/** True iff `issuer` issued and signed the CRL. */
 export function isCrlIssuedBy(crl: Crl, issuer: Certificate): boolean {
   if (!crl.issuerName.equals(issuer.subjectName)) return false;
   if (issuer.keyUsage && !issuer.keyUsage.has('cRLSign')) return false;

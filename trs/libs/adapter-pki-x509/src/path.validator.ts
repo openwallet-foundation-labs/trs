@@ -5,7 +5,6 @@ export interface PathInput {
   anchors: Certificate[];
   intermediates: Certificate[];
   at: Date;
-  /** Upper bound on certificates between leaf and anchor. */
   maxIntermediates: number;
 }
 
@@ -15,18 +14,11 @@ export type PathResult =
 export const subjectCn = (c: Certificate): string =>
   /(?:^|\n)CN=([^\n]*)/.exec(c.x509.subject)?.[1] ?? c.sha256.slice(0, 16);
 
-/**
- * RFC 5280 §6.1 path validation, without policy and name-constraint
- * processing (certificates that mark those critical are rejected). Every
- * candidate path from `leaf` to a trust anchor is built and checked; the first
- * valid one wins, otherwise the reasons of all rejected paths are returned.
- */
 export function validatePath(input: PathInput): PathResult {
   const anchors = new Map(input.anchors.map((a) => [a.sha256, a]));
   const pool = [...input.anchors, ...input.intermediates];
   const reasons: string[] = [];
 
-  // The leaf itself is a trust anchor.
   if (anchors.has(input.leaf.sha256)) {
     const why = checkValidity(input.leaf, input.at);
     if (!why) return { valid: true, chain: [input.leaf] };
@@ -67,7 +59,6 @@ function checkValidity(c: Certificate, at: Date): string | undefined {
   return undefined;
 }
 
-/** `chain` runs from the leaf (index 0) to the trust anchor (last). */
 function checkPath(chain: Certificate[], at: Date): string | undefined {
   for (let i = 0; i < chain.length; i++) {
     const cert = chain[i];
@@ -76,13 +67,11 @@ function checkPath(chain: Certificate[], at: Date): string | undefined {
     const validity = checkValidity(cert, at);
     if (validity) return validity;
 
-    // The anchor is trusted as configured; everything below it must be fully understood.
     if (!isAnchor && cert.unhandledCritical.length) {
       return `${subjectCn(cert)} has unsupported critical extension(s) ${cert.unhandledCritical.join(', ')}`;
     }
     if (i === 0) continue;
 
-    // `cert` issued chain[i - 1]: it must be a CA allowed to sign certificates.
     if (!cert.basicConstraints?.ca) {
       return `${subjectCn(cert)} is not a CA certificate`;
     }
@@ -91,7 +80,6 @@ function checkPath(chain: Certificate[], at: Date): string | undefined {
     }
     const pathLength = cert.basicConstraints.pathLength;
     if (pathLength !== undefined) {
-      // Non-self-issued intermediates between this CA and the leaf.
       const below = chain.slice(1, i).filter((c) => !isSelfIssued(c)).length;
       if (below > pathLength) {
         return `${subjectCn(cert)} path length constraint (${pathLength}) exceeded`;

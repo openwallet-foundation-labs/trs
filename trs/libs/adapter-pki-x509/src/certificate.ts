@@ -22,7 +22,6 @@ export const OID = {
   anyExtendedKeyUsage: '2.5.29.37.0',
 } as const;
 
-/** Extensions this adapter evaluates (or may safely ignore) when marked critical. */
 const PROCESSED_EXTENSIONS = new Set<string>([
   OID.basicConstraints,
   OID.keyUsage,
@@ -34,7 +33,6 @@ const PROCESSED_EXTENSIONS = new Set<string>([
   OID.authorityInfoAccess,
 ]);
 
-/** RFC 5280 §4.2.1.3 KeyUsage bit names, in bit order. */
 export const KEY_USAGES = [
   'digitalSignature',
   'nonRepudiation',
@@ -48,7 +46,6 @@ export const KEY_USAGES = [
 ] as const;
 export type KeyUsage = (typeof KEY_USAGES)[number];
 
-/** Short names for common extended key usages (RFC 5280 §4.2.1.12). */
 export const EXT_KEY_USAGES: Record<string, string> = {
   serverAuth: '1.3.6.1.5.5.7.3.1',
   clientAuth: '1.3.6.1.5.5.7.3.2',
@@ -58,26 +55,19 @@ export const EXT_KEY_USAGES: Record<string, string> = {
   OCSPSigning: '1.3.6.1.5.5.7.3.9',
 };
 
-/** A parsed certificate with the fields path validation needs. */
 export interface Certificate {
   der: Buffer;
   x509: X509Certificate;
-  /** SHA-256 fingerprint, lowercase hex. */
   sha256: string;
-  /** Serial number, lowercase hex without leading zeros. */
   serial: string;
-  /** DER encoding of the issuer / subject Name, for exact name matching. */
   issuerName: Buffer;
   subjectName: Buffer;
   notBefore: Date;
   notAfter: Date;
   basicConstraints?: { ca: boolean; pathLength?: number };
-  /** Undefined when the certificate has no keyUsage extension. */
   keyUsage?: Set<KeyUsage>;
-  /** Undefined when the certificate has no extKeyUsage extension. */
   extKeyUsage?: string[];
   crlUrls: string[];
-  /** OIDs of critical extensions this adapter does not process. */
   unhandledCritical: string[];
 }
 
@@ -90,7 +80,6 @@ export function pemOrBase64ToDer(input: string): Buffer {
   return Buffer.from(body, 'base64');
 }
 
-/** Splits a PEM bundle into its certificates; a non-PEM string is one certificate. */
 export function splitPem(input: string): string[] {
   const blocks = input.match(
     /-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g,
@@ -102,7 +91,6 @@ export function parseCertificate(der: Buffer): Certificate {
   const x509 = new X509Certificate(der);
   const cert = readTlv(der, 0);
   const tbsFields = children(der, children(der, cert)[0]);
-  // Optional [0] version comes first; then serial, signature, issuer, validity, subject.
   const base = tbsFields[0]?.tag === 0xa0 ? 1 : 0;
   const [serial, , issuer, , subject] = tbsFields.slice(base, base + 5);
   if (serial?.tag !== TAG.INTEGER || !issuer || !subject) {
@@ -175,17 +163,12 @@ function keyUsage(bits: Buffer): Set<KeyUsage> {
   return set;
 }
 
-/** Collects every uniformResourceIdentifier ([6]) GeneralName below `t`. */
 function uris(der: Buffer, t: Tlv): string[] {
   if (t.tag === 0x86) return [content(der, t).toString('ascii')];
   if (!(t.tag & 0x20)) return [];
   return children(der, t).flatMap((c) => uris(der, c));
 }
 
-/**
- * True iff `issuer` directly issued `subject`: the issuer name matches the
- * issuer's subject AND the signature verifies with the issuer's public key.
- */
 export function isIssuedBy(subject: Certificate, issuer: Certificate): boolean {
   try {
     return (

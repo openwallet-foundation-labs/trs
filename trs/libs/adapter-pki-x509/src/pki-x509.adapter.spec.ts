@@ -22,7 +22,6 @@ import {
 import { PkiX509AdapterModule } from './pki-x509.module';
 import type { PkiX509AdapterOptions } from './pki-x509.options';
 
-/** In-memory CRL fetcher that records every request. */
 class FakeFetcher implements CrlFetcher {
   readonly calls: string[] = [];
   constructor(public crls: Record<string, string | Error>) {}
@@ -130,7 +129,6 @@ describe('PkiX509Adapter', () => {
       );
       expect(r.authorized).toBe(true);
       expect(r.message).toContain('valid.example chains to Example Root CA');
-      // Earliest of the chain's NotAfter (2040) and the CRLs' cache limit (24h).
       expect(r.freshUntil).toEqual(new Date('2030-01-02T00:00:00Z'));
       expect(s.fetcher.calls.sort()).toEqual([ISSUING_CRL_URL, ROOT_CRL_URL]);
     });
@@ -146,7 +144,6 @@ describe('PkiX509Adapter', () => {
         const r = await s.adapter.resolveAuthorization(authz(entityId));
         expect(r.authorized).toBe(true);
       }
-      // Without the offered intermediate there is no path.
       const r = await s.adapter.resolveAuthorization(
         authz(cert('leaf-valid.pem')),
       );

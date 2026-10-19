@@ -1,12 +1,3 @@
-"""Regenerates the test PKI (python3 + `cryptography`). Keys are throwaway.
-
-root ── intermediate (pathLen 0) ─┬─ leaf-valid / leaf-expired / leaf-revoked
-                                  ├─ leaf-client (clientAuth only)
-                                  ├─ leaf-critical (unknown critical extension)
-                                  └─ sub-ca ── leaf-too-deep (pathLen exceeded)
-rogue-root ── leaf-untrusted
-leaf-valid ── leaf-by-leaf (issuer is not a CA)
-"""
 import datetime as dt
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -94,9 +85,7 @@ save("rogue-root.pem", rogue)
 save("leaf-untrusted.pem", cert("untrusted.example", k(), (rogue.subject, rogue_key), **LEAF))
 save("leaf-by-leaf.pem", cert("by-leaf.example", k(), (valid.subject, valid_key)))
 
-# The leaf was revoked in 2028: valid before, revoked after.
 save("issuing.crl.pem", crl(inter, int_key, [(revoked.serial_number, D(2028))]))
 save("root.crl.pem", crl(root, root_key, []))
 save("issuing-stale.crl.pem", crl(inter, int_key, [], this_update=D(2024), next_update=D(2025)))
-# Same issuer name, signed by the wrong key: must never be accepted.
 save("issuing-forged.crl.pem", crl(inter, rogue_key, []))

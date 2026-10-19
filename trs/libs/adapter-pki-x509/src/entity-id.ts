@@ -12,17 +12,6 @@ export class InvalidEntityIdError extends AdapterError {
   }
 }
 
-/**
- * How a TRQP `entity_id` names the certificate to validate. The first
- * certificate is the end entity; any further ones are untrusted intermediates
- * offered for path building (like a TLS chain or a JOSE `x5c`).
- *
- * | entity_id                                 | meaning                          |
- * |-------------------------------------------|----------------------------------|
- * | `x509:cert:<base64/base64url DER>`        | a certificate (also: bare `MII…`) |
- * | `x509:x5c:<base64 DER>,<base64 DER>,…`    | leaf first, then intermediates   |
- * | `-----BEGIN CERTIFICATE-----…` (1 or more) | PEM, leaf first                  |
- */
 export function parseEntityId(entityId: string): Certificate[] {
   const id = entityId.trim();
   let parts: string[];

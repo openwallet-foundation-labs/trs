@@ -1,6 +1,5 @@
 import { Crl, parseCrl } from './crl';
 
-/** Retrieves the DER (or PEM) bytes of a CRL. Swap it out for tests or proxies. */
 export interface CrlFetcher {
   fetch(url: string): Promise<Buffer>;
 }
@@ -21,11 +20,6 @@ export class CrlFetchError extends Error {
   }
 }
 
-/**
- * Default fetcher on top of Node's global `fetch`. CRLs are signed, so plain
- * http (the norm for CRL distribution points) is accepted; ldap and other
- * schemes are not. Bounded time and size; same-origin redirects only.
- */
 export class HttpCrlFetcher implements CrlFetcher {
   private readonly timeoutMs: number;
   private readonly maxBytes: number;
@@ -107,7 +101,6 @@ export class HttpCrlFetcher implements CrlFetcher {
 export interface LoadedCrl {
   url: string;
   crl: Crl;
-  /** Cached until the earlier of NextUpdate and the cache age limit. */
   expiresAt: Date;
 }
 
@@ -117,7 +110,6 @@ interface Entry {
   pending?: Promise<LoadedCrl>;
 }
 
-/** Caches fetched CRLs; concurrent loads of one URL share a single fetch. */
 export class CrlStore {
   private readonly entries = new Map<string, Entry>();
 

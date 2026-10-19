@@ -1,11 +1,7 @@
-/** Minimal DER reader — just enough for certificate extensions and CRLs. */
 export interface Tlv {
   tag: number;
-  /** First byte of the TLV (tag). */
   offset: number;
-  /** First content byte. */
   start: number;
-  /** One past the last content byte. */
   end: number;
 }
 
@@ -38,7 +34,6 @@ export function children(buf: Buffer, parent: Tlv): Tlv[] {
   return out;
 }
 
-/** The complete encoding (tag + length + content) of a TLV. */
 export const raw = (buf: Buffer, t: Tlv): Buffer =>
   buf.subarray(t.offset, t.end);
 
@@ -73,7 +68,6 @@ export function decodeOid(bytes: Buffer): string {
   return [...head, ...parts].join('.');
 }
 
-/** UTCTime / GeneralizedTime (the forms RFC 5280 allows: `Z`, no fractions needed). */
 export function decodeTime(buf: Buffer, t: Tlv): Date {
   const s = content(buf, t).toString('ascii');
   const m =
@@ -97,7 +91,6 @@ export function decodeTime(buf: Buffer, t: Tlv): Date {
   );
 }
 
-/** Lowercase hex of an INTEGER without leading zero bytes (serial numbers). */
 export function integerHex(buf: Buffer, t: Tlv): string {
   let bytes = content(buf, t);
   while (bytes.length > 1 && bytes[0] === 0) bytes = bytes.subarray(1);

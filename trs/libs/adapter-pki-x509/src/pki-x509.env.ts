@@ -2,14 +2,6 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import type { PkiAuthority, PkiX509AdapterOptions } from './pki-x509.options';
 
-/**
- * Environment variables read by {@link pkiX509OptionsFromEnv}.
- *
- * - `TRS_PKI_CONFIG` — path to a JSON file `{ "authorities": [PkiAuthority, …] }`.
- *                      `trustAnchors`, `intermediates` and `crls` entries are
- *                      inline PEM / base64 DER, or file paths relative to the
- *                      JSON file.
- */
 export const PKI_X509_ENV = {
   config: 'TRS_PKI_CONFIG',
 } as const;
@@ -17,11 +9,6 @@ export const PKI_X509_ENV = {
 const isInline = (v: string) =>
   v.includes('-----BEGIN') || /^[A-Za-z0-9+/=_-]{64,}$/.test(v.trim());
 
-/**
- * Builds adapter options from the environment. Without `TRS_PKI_CONFIG` the
- * adapter has no authorities. Throws at startup on a missing or malformed
- * file — a misconfiguration should not surface later as "no adapter".
- */
 export function pkiX509OptionsFromEnv(
   env: NodeJS.ProcessEnv = process.env,
   read: (path: string) => string = (p) => readFileSync(p, 'utf8'),

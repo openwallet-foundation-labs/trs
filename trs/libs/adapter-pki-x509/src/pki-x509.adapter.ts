@@ -27,14 +27,12 @@ import { parseEntityId } from './entity-id';
 import { subjectCn, validatePath } from './path.validator';
 import { PKI_X509_OPTIONS, PkiX509AdapterOptions } from './pki-x509.options';
 
-/** Revocation status could not be determined, so no answer is possible → 503. */
 export class RevocationUnavailableError extends AdapterError {
   constructor(detail: string) {
     super(`Revocation status unavailable: ${detail}`, 503);
   }
 }
 
-/** `resource` / `action` names an unknown key usage → 400. */
 export class InvalidUsageError extends AdapterError {
   constructor(detail: string) {
     super(`Invalid PKI usage: ${detail}`, 400);
@@ -60,21 +58,6 @@ type RevocationResult =
 
 const isAny = (v: string) => v === '*' || v.toLowerCase() === 'any';
 
-/**
- * PKI / X.509 adapter (RFC 5280).
- *
- * - `authority_id` — the id of a configured PKI (its trust anchors).
- * - `entity_id`    — the end-entity certificate, optionally with intermediates
- *                    (see `parseEntityId`).
- * - `resource`     — required extended key usage (`serverAuth`, an OID, `*`).
- * - `action`       — required key usage (`digitalSignature`, …, `any`).
- * - `context.time` — validation time (certificate validity, revocation date).
- *
- * Authorized iff the certificate chains to one of the authority's trust
- * anchors, every certificate on the path is valid and not revoked, and the
- * leaf allows the requested usage. Recognition: the authority recognizes a CA
- * certificate that chains to one of its trust anchors.
- */
 @TrustAdapter('pki-x509', { order: 50 })
 export class PkiX509Adapter implements TrustProtocolAdapter {
   readonly id = 'pki-x509';
@@ -120,13 +103,9 @@ export class PkiX509Adapter implements TrustProtocolAdapter {
     });
   }
 
-  // ---------------------------------------------------------------- routing
-
   async canHandle(authorityId: string): Promise<boolean> {
     return this.authorities.has(authorityId.trim());
   }
-
-  // ---------------------------------------------------------- authorization
 
   async resolveAuthorization(
     input: AuthorizationInput,
@@ -151,8 +130,6 @@ export class PkiX509Adapter implements TrustProtocolAdapter {
     return { authorized: true, ...verdict.outcome };
   }
 
-  // ------------------------------------------------------------ recognition
-
   async resolveRecognition(
     input: RecognitionInput,
   ): Promise<RecognitionOutcome> {
@@ -167,8 +144,6 @@ export class PkiX509Adapter implements TrustProtocolAdapter {
     const verdict = await this.verify(authority, ca, offered, this.at(input));
     return { recognized: verdict.ok, ...verdict.outcome };
   }
-
-  // ---------------------------------------------------------------- helpers
 
   private now(): Date {
     return this.opts.now ? this.opts.now() : new Date();
@@ -186,7 +161,6 @@ export class PkiX509Adapter implements TrustProtocolAdapter {
     return authority;
   }
 
-  /** Path validation plus revocation, shared by authorization and recognition. */
   private async verify(
     authority: Authority,
     leaf: Certificate,
@@ -257,7 +231,6 @@ export class PkiX509Adapter implements TrustProtocolAdapter {
     };
   }
 
-  /** Checks every certificate below the trust anchor against its issuer's CRL. */
   private async checkRevocation(
     authority: Authority,
     chain: Certificate[],
@@ -354,7 +327,6 @@ export class PkiX509Adapter implements TrustProtocolAdapter {
     return oid;
   }
 
-  /** RFC 5280: an absent keyUsage / extKeyUsage extension does not restrict usage. */
   private checkUsage(
     leaf: Certificate,
     keyUsage?: KeyUsage,

@@ -38,6 +38,13 @@
       "sourceRoot": "libs/adapter-eu-trusted-list/src",
       "compilerOptions": { "tsConfigPath": "libs/adapter-eu-trusted-list/tsconfig.lib.json" }
     },
+    "adapter-pki-x509": {
+      "type": "library",
+      "root": "libs/adapter-pki-x509",
+      "entryFile": "index",
+      "sourceRoot": "libs/adapter-pki-x509/src",
+      "compilerOptions": { "tsConfigPath": "libs/adapter-pki-x509/tsconfig.lib.json" }
+    },
     "cache": {
       "type": "library",
       "root": "libs/cache",

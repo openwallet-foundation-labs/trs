@@ -26,6 +26,8 @@
       "@app/adapter-did-web/*": ["libs/adapter-did-web/src/*"],
       "@app/adapter-eu-trusted-list": ["libs/adapter-eu-trusted-list/src"],
       "@app/adapter-eu-trusted-list/*": ["libs/adapter-eu-trusted-list/src/*"],
+      "@app/adapter-pki-x509": ["libs/adapter-pki-x509/src"],
+      "@app/adapter-pki-x509/*": ["libs/adapter-pki-x509/src/*"],
       "@app/cache": ["libs/cache/src"],
       "@app/cache/*": ["libs/cache/src/*"]
     }

@@ -11,6 +11,7 @@ module.exports = {
     '^@app/adapter-kit/(.*)$': '<rootDir>/libs/adapter-kit/src/$1',
     '^@app/adapter-did-web$': '<rootDir>/libs/adapter-did-web/src',
     '^@app/adapter-eu-trusted-list$': '<rootDir>/libs/adapter-eu-trusted-list/src',
+    '^@app/adapter-pki-x509$': '<rootDir>/libs/adapter-pki-x509/src',
     '^@app/cache$': '<rootDir>/libs/cache/src',
   },
   testEnvironment: 'node',

@@ -44,6 +44,19 @@ const config = {
     ],
   ],
 
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'tech-report',
+        path: 'tech-report',
+        routeBasePath: 'tech-report',
+        sidebarPath: './sidebarsTechReport.js',
+        editUrl: 'https://github.com/openwallet-foundation-labs/trs/tree/main/website/',
+      },
+    ],
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -58,6 +71,13 @@ const config = {
             sidebarId: 'docs',
             position: 'left',
             label: 'Docs',
+          },
+          {
+            type: 'docSidebar',
+            sidebarId: 'techReport',
+            docsPluginId: 'tech-report',
+            position: 'left',
+            label: 'Tech Report',
           },
           {
             href: 'https://github.com/openwallet-foundation-labs/trs',

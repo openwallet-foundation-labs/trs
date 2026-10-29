@@ -14,7 +14,7 @@ const sidebars = {
       type: 'category',
       label: 'Adapters',
       collapsed: false,
-      items: ['adapters/eu-trusted-list'],
+      items: ['adapters/eu-trusted-list', 'adapters/pki-x509'],
     },
     {
       type: 'category',

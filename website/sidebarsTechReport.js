@@ -2,7 +2,7 @@
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
-  techReport: ['intro'],
+  techReport: ['intro', 'trs-design-rationale'],
 };
 
 export default sidebars;

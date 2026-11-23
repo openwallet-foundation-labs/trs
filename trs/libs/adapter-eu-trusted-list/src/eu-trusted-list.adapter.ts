@@ -32,7 +32,7 @@ import {
   normalizeListUrl,
   TrustedListStore,
 } from './trusted-list.store';
-import { pemOrBase64ToDer } from './x509.util';
+import { certInfo, pemOrBase64ToDer } from './x509.util';
 
 /** One or more trusted lists could not be loaded, so no negative answer is possible → 503. */
 export class TrustedListUnavailableError extends AdapterError {
@@ -103,7 +103,18 @@ export class EuTrustedListAdapter implements TrustProtocolAdapter {
         );
       this.roots.set(url, {
         source,
-        signers: (source.signingCertificates ?? []).map(pemOrBase64ToDer),
+        signers: (source.signingCertificates ?? []).map((pin, i) => {
+          // Buffer.from(…, 'base64') drops invalid characters instead of
+          // failing, so an unparseable pin has to be caught here or it becomes
+          // a silently wrong "expected signer".
+          const cert = certInfo(pemOrBase64ToDer(pin));
+          if (!cert) {
+            throw new Error(
+              `EuTrustedListAdapter: ${source.url} signingCertificates #${i + 1} is not a certificate`,
+            );
+          }
+          return cert.der;
+        }),
       });
     }
     this.store = new TrustedListStore({

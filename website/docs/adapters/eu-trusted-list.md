@@ -30,7 +30,7 @@ TRQP query into exactly that lookup.
 | Form | Matches |
 |------|---------|
 | `x509:cert:<base64 DER>`, a PEM certificate, or bare base64 `MII…` | a service whose certificate **is** this certificate (SHA-256 or SKI), **or** that **directly issued** it — names chain *and* the signature verifies with the listed CA key; the certificate must be valid at the evaluation time |
-| `x509:ski:<base64 or 20-byte hex>` | a service by subject key identifier (also matches `X509SKI` in history) |
+| `x509:ski:<base64 or 20-byte hex>` | a service by subject key identifier (also matches `X509SKI` in history). All-hex input must be exactly 20 bytes; it is never re-read as base64 |
 | `x509:sha256:<hex>` | a service certificate by SHA-256 fingerprint |
 | `tsp:<name>` | any service of a TSP by `TSPName` / `TSPTradeName` (case-insensitive). `tsp:VATDE-…` / `tsp:NTRFI-…` only downloads that territory's list |
 
@@ -114,8 +114,10 @@ export interface TrustedListSignatureVerifier {
 `ctx.expectedSigners` carries the certificates the signer must match: the
 pinned `signingCertificates` of a configured source (for the EU LoTL: the
 certificates published in the Official Journal), or, for a national list, the
-certificates in the LoTL's `OtherTSLPointer`. While no verifier is configured
-every answer carries `[list signature not verified]` in its `message`.
+certificates in the LoTL's `OtherTSLPointer`. A pin that is not a parseable
+certificate is refused at startup, so a typo cannot become a silently wrong
+expected signer. While no verifier is configured every answer carries
+`[list signature not verified]` in its `message`.
 
 ```ts
 EuTrustedListAdapterModule.forRoot({

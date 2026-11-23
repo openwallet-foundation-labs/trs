@@ -40,6 +40,17 @@ describe('entity_id parsing', () => {
     });
   });
 
+  it('rejects x509:ski hex of the wrong length instead of reading it as base64', () => {
+    // `deadbeef` is valid base64 too; decoding it silently produced a wrong
+    // key id and a quiet `authorized: false` rather than a 400.
+    expect(() => parseEntityId('x509:ski:deadbeef')).toThrow(
+      /hex must be 20 bytes, got 4/,
+    );
+    expect(() => parseEntityId('x509:ski:deadbeef')).toThrow(
+      InvalidEntityIdError,
+    );
+  });
+
   it('rejects unknown forms and unparseable certificates with a 400', () => {
     expect(() => parseEntityId('did:web:example.com')).toThrow(
       InvalidEntityIdError,

@@ -340,5 +340,35 @@ describe('EuTrustedListAdapter', () => {
         setup({ requireSignatureVerification: true }),
       ).rejects.toThrow(/needs a signatureVerifier/);
     });
+
+    it('rejects an unparseable signingCertificates pin at startup', async () => {
+      // base64 decoding drops invalid characters rather than failing, so a
+      // mistyped pin used to pass the constructor and become a wrong signer.
+      await expect(
+        setup({
+          sources: [
+            {
+              url: LOTL_URL,
+              kind: 'lotl',
+              signingCertificates: ['not a cert'],
+            },
+          ],
+        }),
+      ).rejects.toThrow(/signingCertificates #1 is not a certificate/);
+    });
+
+    it('accepts a PEM signingCertificates pin', async () => {
+      await expect(
+        setup({
+          sources: [
+            {
+              url: LOTL_URL,
+              kind: 'lotl',
+              signingCertificates: [pem('unlisted-ca')],
+            },
+          ],
+        }),
+      ).resolves.toBeDefined();
+    });
   });
 });

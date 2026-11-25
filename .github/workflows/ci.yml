@@ -53,3 +53,19 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - run: npm ci
       - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t trs-resolver:ci .
+      - name: Smoke test
+        run: |
+          docker run -d --name trs -p 3000:3000 trs-resolver:ci
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:3000/health && exit 0
+            sleep 1
+          done
+          docker logs trs
+          exit 1

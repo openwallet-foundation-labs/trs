@@ -23,10 +23,14 @@ export const DEFAULT_TTL_MS = 60_000;
  * Bounded LRU: `Map` keeps insertion order, so a hit is re-inserted to mark it
  * most recently used and an overflow drops the first (oldest) key. Expired
  * entries are removed when they are read, and otherwise age out via the bound.
+ *
+ * Concurrent misses for the same key share one in-flight `fn` call, so a burst
+ * of identical queries does the expensive work once.
  */
 @Injectable()
 export class CacheService {
   private readonly store = new Map<string, Entry>();
+  private readonly inflight = new Map<string, Promise<unknown>>();
   private readonly maxEntries: number;
 
   constructor(@Optional() @Inject(CACHE_OPTIONS) opts?: CacheOptions) {
@@ -55,10 +59,21 @@ export class CacheService {
         return hit.value as T;
       }
     }
-    const value = await fn();
-    const ttl = typeof ttlMs === 'function' ? ttlMs(value) : ttlMs;
-    if (ttl > 0) this.set(key, value, ttl);
-    return value;
+    const pending = this.inflight.get(key);
+    if (pending) return pending as Promise<T>;
+
+    const run = (async () => {
+      try {
+        const value = await fn();
+        const ttl = typeof ttlMs === 'function' ? ttlMs(value) : ttlMs;
+        if (ttl > 0) this.set(key, value, ttl);
+        return value;
+      } finally {
+        this.inflight.delete(key);
+      }
+    })();
+    this.inflight.set(key, run);
+    return run;
   }
 
   private set(key: string, value: unknown, ttlMs: number): void {

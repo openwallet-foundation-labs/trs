@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/openwallet-foundation-labs/trs/security/advisories/new
+    about: Please report vulnerabilities privately, not as public issues.
+  - name: Developer docs
+    url: https://openwallet-foundation-labs.github.io/trs/
+    about: Architecture, adapters and contributing guide.

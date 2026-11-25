@@ -1,0 +1,28 @@
+name: Trust adapter request
+description: Propose support for a new trust protocol or registry
+labels: [enhancement]
+body:
+  - type: input
+    id: protocol
+    attributes:
+      label: Trust protocol / registry
+      placeholder: e.g. did:webvh, OpenID Federation
+    validations:
+      required: true
+  - type: input
+    id: spec
+    attributes:
+      label: Specification link
+    validations:
+      required: true
+  - type: textarea
+    id: mapping
+    attributes:
+      label: TRQP mapping
+      description: How would `authority_id`, `entity_id`, `action` and `resource` map onto this protocol?
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to implement this adapter

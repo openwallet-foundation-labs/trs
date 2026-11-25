@@ -1,0 +1,39 @@
+name: Bug report
+description: Something in the resolver, an adapter or the client SDK behaves incorrectly
+labels: [bug]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Resolver (API, routing, caching)
+        - Adapter
+        - Client SDK
+        - Docs
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Include the TRQP query you sent and the response you got, if relevant.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+  - type: input
+    id: version
+    attributes:
+      label: Commit or version
+      placeholder: e.g. main @ 294abcd

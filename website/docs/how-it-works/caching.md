@@ -15,11 +15,10 @@ identical queries are answered without redoing that work.
 
 ```ts
 async wrap<T>(key: string, fn: () => Promise<T>, ttlMs = 60_000): Promise<T> {
-  const now = Date.now();
   const hit = this.store.get(key);
-  if (hit && hit.expires > now) return hit.value as T;  // HIT: return, fn never runs
-  const value = await fn();                              // MISS/expired: do the work
-  this.store.set(key, { value, expires: now + ttlMs });
+  if (hit && hit.expires > Date.now()) return hit.value as T; // HIT: fn never runs
+  const value = await fn();                                    // MISS/expired: do the work
+  this.set(key, value, ttlMs);                                 // store, evicting LRU if full
   return value;
 }
 ```
@@ -55,5 +54,16 @@ The in-memory cache is a starting point. Known gaps (tracked for later work):
   the negative-caching policy is still open.
 - **In-memory only** — the cache is per-process; a shared backend (e.g. Redis)
   would come later behind the same interface.
-- **No eviction / size bound** and **no in-flight de-duplication** (two
-  concurrent misses both run the work).
+- **No in-flight de-duplication** — two concurrent misses both run the work.
+
+## Size bound
+
+The store is a bounded LRU (default `10_000` entries). A hit moves the entry to
+the most-recently-used end; when a write pushes the store over the limit, the
+least recently used entry is dropped. Expired entries are removed when read and
+otherwise age out through the same bound. Override the limit by providing
+`CACHE_OPTIONS`:
+
+```ts
+{ provide: CACHE_OPTIONS, useValue: { maxEntries: 50_000 } }
+```

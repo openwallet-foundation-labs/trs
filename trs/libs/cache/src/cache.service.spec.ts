@@ -48,3 +48,26 @@ describe('CacheService', () => {
     expect(kept).not.toHaveBeenCalled();
   });
 });
+
+describe('CacheService TTL', () => {
+  it('derives the TTL from the computed value', async () => {
+    jest.useFakeTimers();
+    const cache = new CacheService();
+    const fn = jest.fn(async () => ({ ttl: 500 }));
+    await cache.wrap('k', fn, (v) => v.ttl);
+    jest.advanceTimersByTime(400);
+    await cache.wrap('k', fn, (v) => v.ttl);
+    expect(fn).toHaveBeenCalledTimes(1);
+    jest.advanceTimersByTime(200);
+    await cache.wrap('k', fn, (v) => v.ttl);
+    expect(fn).toHaveBeenCalledTimes(2);
+    jest.useRealTimers();
+  });
+
+  it('does not store a value whose TTL is zero or negative', async () => {
+    const cache = new CacheService();
+    expect(await cache.wrap('k', () => Promise.resolve('v'), 0)).toBe('v');
+    expect(await cache.wrap('j', () => Promise.resolve('v'), -1)).toBe('v');
+    expect(cache.size).toBe(0);
+  });
+});

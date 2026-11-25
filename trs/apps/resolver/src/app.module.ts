@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AdapterKitModule } from '@app/adapter-kit';
 import { CacheModule } from '@app/cache';
 import { AdaptersModule } from './adapters/adapters.module';
+import { HealthController } from './health/health.controller';
 import { TrqpController } from './trqp/trqp.controller';
 import { ResolverService } from './resolver/resolver.service';
 
@@ -11,7 +12,7 @@ import { ResolverService } from './resolver/resolver.service';
  */
 @Module({
   imports: [AdapterKitModule, CacheModule, AdaptersModule],
-  controllers: [TrqpController],
+  controllers: [TrqpController, HealthController],
   providers: [ResolverService],
 })
 export class AppModule {}

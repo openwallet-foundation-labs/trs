@@ -2,6 +2,7 @@
   "name": "@trs/trqp-core",
   "version": "0.0.1",
   "private": true,
+  "license": "Apache-2.0",
   "description": "Shared TRQP v2.0 types & zod schemas (single source of truth)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -86,6 +86,8 @@ describe('AdapterRegistry (order-based first-match)', () => {
   });
 
   it('canHandle throws + no other match → RoutingUnavailableError (503)', async () => {
-    await expect(reg.select('boom:q')).rejects.toBeInstanceOf(RoutingUnavailableError);
+    await expect(reg.select('boom:q')).rejects.toBeInstanceOf(
+      RoutingUnavailableError,
+    );
   });
 });

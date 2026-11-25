@@ -22,12 +22,20 @@ export class AdapterRegistry implements OnModuleInit {
     const found: { order: number; instance: TrustProtocolAdapter }[] = [];
     for (const wrapper of this.discovery.getProviders()) {
       if (!wrapper.metatype || !wrapper.instance) continue;
-      const meta = this.reflector.get<TrustAdapterMeta>(TRUST_ADAPTER, wrapper.metatype);
+      const meta = this.reflector.get<TrustAdapterMeta>(
+        TRUST_ADAPTER,
+        wrapper.metatype,
+      );
       if (meta) {
-        found.push({ order: meta.order, instance: wrapper.instance as TrustProtocolAdapter });
+        found.push({
+          order: meta.order,
+          instance: wrapper.instance as TrustProtocolAdapter,
+        });
       }
     }
-    this.adapters = found.sort((a, b) => a.order - b.order).map((f) => f.instance);
+    this.adapters = found
+      .sort((a, b) => a.order - b.order)
+      .map((f) => f.instance);
   }
 
   /** Adapters in evaluation order (for diagnostics/tests). */
@@ -40,7 +48,10 @@ export class AdapterRegistry implements OnModuleInit {
    * truthy wins (short-circuit). If none match and some `canHandle` threw,
    * routing is unavailable (503); otherwise no adapter is found (404).
    */
-  async select(authorityId: string, ctx?: TrqpContext): Promise<TrustProtocolAdapter> {
+  async select(
+    authorityId: string,
+    ctx?: TrqpContext,
+  ): Promise<TrustProtocolAdapter> {
     let deferredError = false;
     for (const adapter of this.adapters) {
       try {

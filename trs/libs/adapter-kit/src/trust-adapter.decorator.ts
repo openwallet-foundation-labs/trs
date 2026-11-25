@@ -15,5 +15,8 @@ export interface TrustAdapterMeta {
 export const TrustAdapter = (id: string, opts: { order?: number } = {}) =>
   applyDecorators(
     Injectable(),
-    SetMetadata(TRUST_ADAPTER, { id, order: opts.order ?? 100 } as TrustAdapterMeta),
+    SetMetadata(TRUST_ADAPTER, {
+      id,
+      order: opts.order ?? 100,
+    } as TrustAdapterMeta),
   );

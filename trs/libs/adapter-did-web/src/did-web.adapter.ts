@@ -20,12 +20,22 @@ export class DidWebAdapter implements TrustProtocolAdapter {
     return authorityId.startsWith('did:web:');
   }
 
-  async resolveAuthorization(input: AuthorizationInput): Promise<AuthorizationOutcome> {
+  async resolveAuthorization(
+    input: AuthorizationInput,
+  ): Promise<AuthorizationOutcome> {
     // TODO(#17): fetch /.well-known/did.json, verify, map to a real decision.
-    return { authorized: true, message: `did:web resolved (stub) for ${input.authorityId}` };
+    return {
+      authorized: true,
+      message: `did:web resolved (stub) for ${input.authorityId}`,
+    };
   }
 
-  async resolveRecognition(input: RecognitionInput): Promise<RecognitionOutcome> {
-    return { recognized: true, message: `did:web resolved (stub) for ${input.authorityId}` };
+  async resolveRecognition(
+    input: RecognitionInput,
+  ): Promise<RecognitionOutcome> {
+    return {
+      recognized: true,
+      message: `did:web resolved (stub) for ${input.authorityId}`,
+    };
   }
 }

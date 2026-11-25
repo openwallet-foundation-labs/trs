@@ -14,6 +14,8 @@ export const CACHE_OPTIONS = Symbol('CACHE_OPTIONS');
 
 export const DEFAULT_MAX_ENTRIES = 10_000;
 
+export const DEFAULT_TTL_MS = 60_000;
+
 /**
  * Minimal in-memory TTL cache (#16). The interface is intentionally the same
  * shape a Redis-backed impl would use later.
@@ -35,7 +37,16 @@ export class CacheService {
     return this.store.size;
   }
 
-  async wrap<T>(key: string, fn: () => Promise<T>, ttlMs = 60_000): Promise<T> {
+  /**
+   * Return the cached value for `key`, or run `fn` and cache its result.
+   * `ttlMs` may be a function of the computed value; a TTL of zero or less
+   * means the result is returned but not stored.
+   */
+  async wrap<T>(
+    key: string,
+    fn: () => Promise<T>,
+    ttlMs: number | ((value: T) => number) = DEFAULT_TTL_MS,
+  ): Promise<T> {
     const hit = this.store.get(key);
     if (hit) {
       this.store.delete(key);
@@ -45,7 +56,8 @@ export class CacheService {
       }
     }
     const value = await fn();
-    this.set(key, value, ttlMs);
+    const ttl = typeof ttlMs === 'function' ? ttlMs(value) : ttlMs;
+    if (ttl > 0) this.set(key, value, ttl);
     return value;
   }
 

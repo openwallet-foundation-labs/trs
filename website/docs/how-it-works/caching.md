@@ -43,14 +43,18 @@ async authorize(q: AuthorizationQuery): Promise<AuthorizationResponse> {
   (including any well-known probe) nor resolution runs. This is what makes
   probe-based routing cheap: at most one probe per authority.
 
+## TTL and `freshUntil`
+
+Entries live for the default TTL (60 s) unless the adapter reports a sooner
+natural expiry via `freshUntil` (certificate `NotAfter`, trusted-list
+`nextUpdate`, statement `exp`, …). The resolver then uses the shorter of the
+two, so a cached decision never outlives the data it was derived from. An
+outcome whose `freshUntil` is already in the past is returned but not cached.
+
 ## Current limitations
 
 The in-memory cache is a starting point. Known gaps (tracked for later work):
 
-- **`freshUntil` is not wired in yet** — adapters can report a natural freshness
-  (certificate expiry, trusted-list `nextUpdate`, statement `exp`), but the
-  resolver currently uses the fixed default TTL. Feeding `freshUntil` into the
-  TTL is a TODO.
 - **Errors are not cached** — a thrown error propagates and is not stored, so
   the negative-caching policy is still open.
 - **In-memory only** — the cache is per-process; a shared backend (e.g. Redis)

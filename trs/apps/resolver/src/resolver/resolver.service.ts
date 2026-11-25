@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AdapterRegistry } from '@app/adapter-kit';
 import type { AuthorizationInput } from '@app/adapter-kit';
-import { CacheService } from '@app/cache';
+import { CacheService, DEFAULT_TTL_MS } from '@app/cache';
 import type {
   AuthorizationQuery,
   AuthorizationResponse,
@@ -19,31 +19,52 @@ export class ResolverService {
   ) {}
 
   async authorize(q: AuthorizationQuery): Promise<AuthorizationResponse> {
-    return this.cache.wrap(queryCacheKey('authz', q), async () => {
-      const adapter = await this.registry.select(q.authority_id, q.context);
-      const outcome = await adapter.resolveAuthorization(toInput(q));
-      return {
-        authorized: outcome.authorized,
-        ...echo(q),
-        message: outcome.message,
-      };
-    });
+    let freshUntil: Date | undefined;
+    return this.cache.wrap(
+      queryCacheKey('authz', q),
+      async () => {
+        const adapter = await this.registry.select(q.authority_id, q.context);
+        const outcome = await adapter.resolveAuthorization(toInput(q));
+        freshUntil = outcome.freshUntil;
+        return {
+          authorized: outcome.authorized,
+          ...echo(q),
+          message: outcome.message,
+        };
+      },
+      () => ttlFor(freshUntil),
+    );
   }
 
   async recognize(q: RecognitionQuery): Promise<RecognitionResponse> {
-    return this.cache.wrap(queryCacheKey('recog', q), async () => {
-      const adapter = await this.registry.select(q.authority_id, q.context);
-      const outcome = await adapter.resolveRecognition(toInput(q));
-      return {
-        recognized: outcome.recognized,
-        ...echo(q),
-        message: outcome.message,
-      };
-    });
+    let freshUntil: Date | undefined;
+    return this.cache.wrap(
+      queryCacheKey('recog', q),
+      async () => {
+        const adapter = await this.registry.select(q.authority_id, q.context);
+        const outcome = await adapter.resolveRecognition(toInput(q));
+        freshUntil = outcome.freshUntil;
+        return {
+          recognized: outcome.recognized,
+          ...echo(q),
+          message: outcome.message,
+        };
+      },
+      () => ttlFor(freshUntil),
+    );
   }
 }
 
 type Query = AuthorizationQuery | RecognitionQuery;
+
+/**
+ * Cache TTL for an adapter outcome: the default, shortened to the adapter's
+ * `freshUntil` when that comes sooner. Already-stale outcomes are not cached.
+ */
+export function ttlFor(freshUntil: Date | undefined, now = Date.now()): number {
+  if (!freshUntil) return DEFAULT_TTL_MS;
+  return Math.min(DEFAULT_TTL_MS, freshUntil.getTime() - now);
+}
 
 function toInput(q: Query): AuthorizationInput {
   return {

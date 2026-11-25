@@ -27,8 +27,7 @@ The resolver uses it around the whole route-and-resolve step:
 
 ```ts
 async authorize(q: AuthorizationQuery): Promise<AuthorizationResponse> {
-  const key = `authz|${q.authority_id}|${q.entity_id}|${q.action}|${q.resource}|${q.context?.time ?? ''}`;
-  return this.cache.wrap(key, async () => {
+  return this.cache.wrap(queryCacheKey('authz', q), async () => {
     const adapter = await this.registry.select(q.authority_id, q.context);
     const outcome = await adapter.resolveAuthorization(/* … */);
     return /* TRQP response */;
@@ -36,8 +35,10 @@ async authorize(q: AuthorizationQuery): Promise<AuthorizationResponse> {
 }
 ```
 
-- **Key** — every query parameter that affects the answer. Identical queries
-  share an entry; a different `action`, `entity`, etc. gets its own.
+- **Key** — every query parameter that affects the answer (including
+  `context.time` and `context.locator`), JSON-encoded so a free-form value such
+  as `entity_id` cannot collide with another query. Identical queries share an
+  entry; a different `action`, `entity`, etc. gets its own.
 - **Cached value** — the fully-mapped TRQP response. On a hit, neither routing
   (including any well-known probe) nor resolution runs. This is what makes
   probe-based routing cheap: at most one probe per authority.

@@ -51,6 +51,12 @@ natural expiry via `freshUntil` (certificate `NotAfter`, trusted-list
 two, so a cached decision never outlives the data it was derived from. An
 outcome whose `freshUntil` is already in the past is returned but not cached.
 
+## In-flight de-duplication
+
+Concurrent misses for the same key share one in-flight call: the first request
+does the work and the rest await its promise. If that call fails, every waiter
+gets the error and nothing is cached, so the next request tries again.
+
 ## Current limitations
 
 The in-memory cache is a starting point. Known gaps (tracked for later work):
@@ -59,7 +65,6 @@ The in-memory cache is a starting point. Known gaps (tracked for later work):
   the negative-caching policy is still open.
 - **In-memory only** — the cache is per-process; a shared backend (e.g. Redis)
   would come later behind the same interface.
-- **No in-flight de-duplication** — two concurrent misses both run the work.
 
 ## Size bound
 

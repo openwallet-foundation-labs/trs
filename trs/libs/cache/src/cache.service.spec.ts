@@ -71,3 +71,48 @@ describe('CacheService TTL', () => {
     expect(cache.size).toBe(0);
   });
 });
+
+describe('CacheService in-flight de-duplication', () => {
+  function deferred<T>() {
+    let resolve!: (v: T) => void;
+    let reject!: (e: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it('runs fn once for concurrent misses on the same key', async () => {
+    const cache = new CacheService();
+    const d = deferred<string>();
+    const fn = jest.fn(() => d.promise);
+    const calls = [
+      cache.wrap('k', fn),
+      cache.wrap('k', fn),
+      cache.wrap('k', fn),
+    ];
+    d.resolve('v');
+    expect(await Promise.all(calls)).toEqual(['v', 'v', 'v']);
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not share work across different keys', async () => {
+    const cache = new CacheService();
+    const fn = jest.fn(async () => 'v');
+    await Promise.all([cache.wrap('a', fn), cache.wrap('b', fn)]);
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it('propagates a shared rejection and retries on the next call', async () => {
+    const cache = new CacheService();
+    const d = deferred<string>();
+    const failing = jest.fn(() => d.promise);
+    const calls = [cache.wrap('k', failing), cache.wrap('k', failing)];
+    d.reject(new Error('boom'));
+    for (const c of calls) await expect(c).rejects.toThrow('boom');
+    expect(failing).toHaveBeenCalledTimes(1);
+
+    expect(await cache.wrap('k', async () => 'ok')).toBe('ok');
+  });
+});

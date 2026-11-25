@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:core
+      - name: Lint
+        working-directory: trs
+        run: pnpm exec eslint "{apps,libs}/**/*.ts"
+      - name: Format
+        working-directory: trs
+        run: pnpm exec prettier --check "{apps,libs}/**/*.ts"
+      - name: Build
+        working-directory: trs
+        run: pnpm build
+      - name: Test
+        working-directory: trs
+        run: pnpm test

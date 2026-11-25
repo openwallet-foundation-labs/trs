@@ -8,7 +8,12 @@ const sidebars = {
       type: 'category',
       label: 'How it works',
       collapsed: false,
-      items: ['how-it-works/overview', 'how-it-works/adapters', 'how-it-works/caching'],
+      items: [
+        'how-it-works/overview',
+        'how-it-works/adapters',
+        'how-it-works/caching',
+        'how-it-works/configuration',
+      ],
     },
     {
       type: 'category',

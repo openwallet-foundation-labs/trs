@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
-import { CacheService } from './cache.service';
+import { cacheOptionsFromEnv } from './cache.env';
+import { CACHE_OPTIONS, CacheService } from './cache.service';
 
 @Module({
-  providers: [CacheService],
+  providers: [
+    { provide: CACHE_OPTIONS, useFactory: () => cacheOptionsFromEnv() },
+    CacheService,
+  ],
   exports: [CacheService],
 })
 export class CacheModule {}

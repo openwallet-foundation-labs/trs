@@ -50,6 +50,21 @@ curl -s -X POST http://localhost:3000/authorization \
 An unknown authority returns `404 application/problem+json`; an invalid body
 returns `400`.
 
+## Run with Docker
+
+The repo root has a multi-stage `Dockerfile` that builds `trqp-core` and the
+resolver and ships only production dependencies, running as a non-root user:
+
+```bash
+docker build -t trs-resolver .
+docker run --rm -p 3000:3000 trs-resolver
+curl -s http://localhost:3000/health   # {"status":"ok"}
+```
+
+Pass [configuration](../how-it-works/configuration.md) with `-e`, e.g.
+`-e TRS_EU_LOTL_URL=...`. Files such as `TRS_PKI_CONFIG` need a volume mount.
+The image declares a `HEALTHCHECK` against `/health`.
+
 ## Where things live
 
 See the [repository layout](../how-it-works/overview.md#repository-layout). The

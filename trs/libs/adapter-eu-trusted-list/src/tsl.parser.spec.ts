@@ -60,6 +60,16 @@ describe('parseTrustedList (ETSI TS 119 612)', () => {
     expect(tl.warnings[0]).toMatch(/incomplete ServiceInformation/);
   });
 
+  it('decodes XML entity references in names (tsp: lookups match on them)', () => {
+    const xml = zzTrustedList().replace(
+      '<tsl:Name xml:lang="en">Example QTSP S.A.</tsl:Name>',
+      '<tsl:Name xml:lang="en">A&amp;B Trust &#x2014; Caf&#233;</tsl:Name>',
+    );
+    expect(parseTrustedList(xml).providers[0].names[0].value).toBe(
+      'A&B Trust \u2014 Caf\u00e9',
+    );
+  });
+
   it('rejects DOCTYPE (XXE / entity expansion)', () => {
     const xml = `<?xml version="1.0"?><!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/passwd">]><TrustServiceStatusList>&e;</TrustServiceStatusList>`;
     expect(() => parseTrustedList(xml)).toThrow(TrustedListParseError);

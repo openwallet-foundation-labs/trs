@@ -38,8 +38,11 @@ const parser = new XMLParser({
   parseTagValue: false,
   parseAttributeValue: false,
   trimValues: true,
-  processEntities: false,
-  htmlEntities: false,
+  // Entity references must be decoded: TSP and service names really do contain
+  // `&amp;`, and `tsp:` lookups compare against those names. Safe here because
+  // parseTrustedList() rejects a DOCTYPE, so no custom entity can be defined.
+  processEntities: true,
+  htmlEntities: true,
   isArray: (tagName) => ARRAY_TAGS.has(tagName),
 });
 

@@ -49,8 +49,20 @@ export function parseEntityId(entityId: string): EntityRef {
 
   if (id.startsWith('x509:ski:')) {
     const v = id.slice('x509:ski:'.length);
-    // 20-byte SHA-1 key ids are the norm; hex is only accepted when unambiguous.
-    const hex = toHex(v, 20) ?? Buffer.from(v, 'base64').toString('hex');
+    const compact = v.replace(/[:\s]/g, '');
+    // 20-byte SHA-1 key ids are the norm. Hex is never re-read as base64:
+    // decoding `deadbeef` as base64 would turn a typo into a wrong key id,
+    // and the query would come back `false` instead of 400.
+    if (HEX.test(compact) && compact.length % 2 === 0) {
+      const hex = toHex(compact, 20);
+      if (!hex) {
+        throw new InvalidEntityIdError(
+          `x509:ski hex must be 20 bytes, got ${compact.length / 2}`,
+        );
+      }
+      return { kind: 'ski', ski: hex };
+    }
+    const hex = Buffer.from(v, 'base64').toString('hex');
     if (!hex) throw new InvalidEntityIdError('empty x509:ski value');
     return { kind: 'ski', ski: hex };
   }

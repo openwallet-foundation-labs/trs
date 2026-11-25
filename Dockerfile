@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:20-alpine AS build
+FROM node:26-alpine AS build
 RUN corepack enable && corepack prepare pnpm@10 --activate
 WORKDIR /repo
 
@@ -17,7 +17,7 @@ RUN pnpm build:core && pnpm --filter trs build
 RUN pnpm --filter trs deploy --prod --legacy /out \
  && cp -r trs/dist /out/dist
 
-FROM node:20-alpine
+FROM node:26-alpine
 ENV NODE_ENV=production \
     TRS_PORT=3000
 WORKDIR /app

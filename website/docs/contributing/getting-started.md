@@ -36,7 +36,7 @@ TRQP endpoints end-to-end (routing, response mapping, RFC 7807 errors).
 
 ```bash
 cd trs
-pnpm start                      # nest start resolver  → http://localhost:3000
+pnpm start                      # nest start resolver  → http://localhost:3000 (TRS_PORT to change)
 ```
 
 Then exercise it:

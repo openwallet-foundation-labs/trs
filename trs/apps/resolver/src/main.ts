@@ -5,6 +5,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { ProblemDetailsFilter } from './trqp/problem-details.filter';
+import { serverConfigFromEnv } from './server.env';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -12,6 +13,7 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
   app.useGlobalFilters(new ProblemDetailsFilter());
-  await app.listen(3000, '0.0.0.0');
+  const { port, host } = serverConfigFromEnv();
+  await app.listen(port, host);
 }
 bootstrap();

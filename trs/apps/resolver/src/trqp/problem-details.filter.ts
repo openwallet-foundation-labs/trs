@@ -1,4 +1,9 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+} from '@nestjs/common';
 import { AdapterError } from '@app/adapter-kit';
 
 /** Converts any thrown error into an RFC 7807 `application/problem+json` response. */
@@ -24,7 +29,10 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       } else if (body && typeof body === 'object') {
         const b = body as Record<string, unknown>;
         title = (b.title as string) ?? (b.error as string) ?? 'Error';
-        if (b.message) detail = Array.isArray(b.message) ? b.message.join(', ') : String(b.message);
+        if (b.message)
+          detail = Array.isArray(b.message)
+            ? b.message.join(', ')
+            : String(b.message);
         if (b.errors) extra.errors = b.errors;
       }
     } else if (exception instanceof Error) {

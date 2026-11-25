@@ -1,5 +1,8 @@
 import { Test } from '@nestjs/testing';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { StaticAdapterModule } from '@app/adapter-kit';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
@@ -17,13 +20,21 @@ describe('TRQP e2e (routing → adapter → response)', () => {
         // order-based first-match against the real did:web adapter.
         StaticAdapterModule.forRoot({
           entries: {
-            'https://acme.example/trust': { authorized: true, recognized: true },
-            'did:web:conflict.example': { authorized: false, recognized: false },
+            'https://acme.example/trust': {
+              authorized: true,
+              recognized: true,
+            },
+            'did:web:conflict.example': {
+              authorized: false,
+              recognized: false,
+            },
           },
         }),
       ],
     }).compile();
-    app = mod.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+    app = mod.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
     app.useGlobalFilters(new ProblemDetailsFilter());
     await app.init();
     // Fastify registers routes lazily; wait until it's ready before supertest hits the server.
@@ -97,14 +108,12 @@ describe('TRQP e2e (routing → adapter → response)', () => {
   });
 
   it('recognition endpoint resolves via static adapter', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/recognition')
-      .send({
-        entity_id: 'https://acme.example/trust',
-        authority_id: 'https://acme.example/trust',
-        action: 'a',
-        resource: 'r',
-      });
+    const res = await request(app.getHttpServer()).post('/recognition').send({
+      entity_id: 'https://acme.example/trust',
+      authority_id: 'https://acme.example/trust',
+      action: 'a',
+      resource: 'r',
+    });
     expect(res.status).toBe(200);
     expect(res.body.recognized).toBe(true);
   });

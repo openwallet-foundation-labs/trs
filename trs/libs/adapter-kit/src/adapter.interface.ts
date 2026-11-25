@@ -35,6 +35,8 @@ export interface TrustProtocolAdapter {
   readonly id: string;
   /** Return true iff this adapter is authoritative for `authorityId`. */
   canHandle(authorityId: string, ctx?: TrqpContext): Promise<boolean>;
-  resolveAuthorization(input: AuthorizationInput): Promise<AuthorizationOutcome>;
+  resolveAuthorization(
+    input: AuthorizationInput,
+  ): Promise<AuthorizationOutcome>;
   resolveRecognition(input: RecognitionInput): Promise<RecognitionOutcome>;
 }
